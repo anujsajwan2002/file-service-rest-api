@@ -22,7 +22,7 @@ public class StorageService {
     @Autowired
     private FileDataRepository fileDataRepository;
 
-    private final String FOLDER_PATH = "D:\\JAVA practice\\files_FileService";
+    private final String FOLDER_PATH = "D:\\JAVA practice\\files_FileService\\";
 
     public String uploadImage(MultipartFile file)throws IOException{
 
