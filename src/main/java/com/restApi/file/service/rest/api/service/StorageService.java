@@ -6,12 +6,16 @@ import com.restApi.file.service.rest.api.repository.FileDataRepository;
 import com.restApi.file.service.rest.api.repository.StorageRepository;
 import com.restApi.file.service.rest.api.utils.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
@@ -24,7 +28,7 @@ public class StorageService {
 
     private final String FOLDER_PATH = "D:\\JAVA practice\\files_FileService\\";
 
-    public String uploadImage(MultipartFile file)throws IOException{
+    public String uploadFile(MultipartFile file)throws IOException{
 
         ImageData imageData = repository.save(ImageData.builder()
                 .name(file.getOriginalFilename())
@@ -36,13 +40,16 @@ public class StorageService {
         return null;
     }
 
-    public byte[] downloadImage(String fileName){
-        Optional<ImageData> dbImageData = repository.findByName(fileName);
-        byte[] images=ImageUtils.decompressImage(dbImageData.get().getImageData());
-        return images;
+    public byte[] downloadFile(String fileName){
+        Optional<ImageData> dbFileData = repository.findByName(fileName);
+
+        if(dbFileData.isPresent()){
+            return ImageUtils.decompressImage(dbFileData.get().getImageData());
+        }
+        return null;
     }
 
-    public String uploadImageToFileSystem(MultipartFile file) throws IOException{
+    public String uploadFileToFileSystem(MultipartFile file) throws IOException{
         String filePath=FOLDER_PATH+file.getOriginalFilename();
 
         FileData fileData = fileDataRepository.save(FileData.builder()
@@ -58,11 +65,24 @@ public class StorageService {
          return null ;
     }
 
-    public byte[] downloadImageFromFileSystem(String fileName) throws IOException {
+    public byte[] downloadFileFromFileSystem(String fileName) throws IOException {
         Optional<FileData> fileData = fileDataRepository.findByName(fileName);
-        String filePath = fileData.get().getFilePath();
-        byte[] images = Files.readAllBytes(new File(filePath).toPath());
-        return images;
+        if(fileData.isPresent()) {
+            String filePath = fileData.get().getFilePath();
+            Path path = Paths.get(filePath);
+            return Files.readAllBytes(path);
+        }
+        return null;
+    }
+
+    public String getFileType(String fileName) throws IOException {
+        Optional<FileData> fileData =fileDataRepository.findByName(fileName);
+
+        if(fileData.isPresent()){
+            Path filePath =Paths.get(fileData.get().getFilePath());
+            String fileType = Files.probeContentType(filePath);
+            return (fileType != null) ? fileType : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
+        return null;
     }
 }
-
