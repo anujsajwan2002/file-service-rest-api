@@ -29,7 +29,7 @@ public class StorageService {
 
     private final String FOLDER_PATH = "D:\\JAVA practice\\files_FileService\\";
 
-    // Ensure the folder exists for all file-related operations
+    // checks folder exists
     private void ensureFolderExists() throws IOException {
         File folder = new File(FOLDER_PATH);
         if (!folder.exists()) {

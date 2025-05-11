@@ -3,16 +3,16 @@ package com.restApi.file.service.rest.api.utils;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-public class ImageUtils {
+public class ImageUtils {  //centralised reusable logic not specific to any domain
 
     public static byte[] compressImage(byte[] data) {
-        Deflater deflater = new Deflater();
+        Deflater deflater = new Deflater();             //Compresses raw image byte data using Java’s built-in deflater.
         deflater.setLevel(Deflater.BEST_COMPRESSION);
         deflater.setInput(data);
         deflater.finish();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-        byte[] tmp = new byte[4 * 1024];
+        byte[] tmp = new byte[4 * 1024];   //temporary buffer to hold data while compressing
         while (!deflater.finished()) {
             int size = deflater.deflate(tmp);
             outputStream.write(tmp, 0, size);
